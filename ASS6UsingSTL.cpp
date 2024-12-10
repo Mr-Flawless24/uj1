@@ -1,48 +1,141 @@
-//Write a program in C++ to use map associative container. The keys will be the names of states and the
-//values will be the populations of the states. When the program runs, the user is prompted to type the
-//name of a state. The program then looks in the map, using the state name as an index and returns the
-//population of the state.
+//Write a C++ program using STL for sorting and searching user defined records such as personal records
+//(Name, DOB, Telephone Number etc.) using vector container.
+
 #include <iostream>
-#include <map>
+#include <algorithm>
+#include <vector>
 #include <string>
 using namespace std;
 
-int main() {
-    // Map to store state names and their populations in millions
-    map<string, int> populationMap = {
-        {"Maharashtra", 125}, {"Uttar Pradesh", 225}, {"Bihar", 120},
-        {"West Bengal", 100}, {"Madhya Pradesh", 90}, {"Tamil Nadu", 80},
-        {"Rajasthan", 78}, {"Andhra Pradesh", 53}, {"Odisha", 47},
-        {"Kerala", 38}, {"Telangana", 37}, {"Assam", 35},
-        {"Jharkhand", 38}, {"Karnataka", 68}, {"Gujarat", 70},
-        {"Punjab", 31}, {"Chhattisgarh", 30}, {"Haryana", 29},
-        {"UT Delhi", 19}, {"UT Jammu and Kashmir", 14}, {"Uttarakhand", 12},
-        {"Himachal Pradesh", 8}
-    };
+// Item class definition
+class Item {
+public:
+    string name;
+    int quantity;
+    int cost;
+    int code;
 
-    // Display all states and their populations
-    cout << "States and Union Territories with their populations:\n";
-    for (const auto& entry : populationMap) {
-        cout << entry.first << ": " << entry.second << " million\n";
+    // Overloaded comparison operators
+    bool operator==(const Item& other) const {
+        return code == other.code;
     }
+    bool operator<(const Item& other) const {
+        return code < other.code;
+    }
+};
 
-    char choice;
+// Global vector to store items
+vector<Item> items;
+
+// Function prototypes
+void insertItem();
+void displayItems();
+void searchItem();
+void deleteItem();
+void sortItems();
+
+int main() {
+    int choice;
+
     do {
-        string state;
-        cout << "\nEnter the state you want to know the population of: ";
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear input buffer
-        getline(cin, state); // Accept multi-word input for states like "West Bengal"
-
-        auto it = populationMap.find(state);
-        if (it != populationMap.end()) {
-            cout << state << "'s population is " << it->second << " million\n";
-        } else {
-            cout << "State not found in the population map.\n";
-        }
-
-        cout << "Do you wish to continue? (y/n): ";
+        cout << "\n***** Menu *****";
+        cout << "\n1. Insert Item";
+        cout << "\n2. Display Items";
+        cout << "\n3. Search Item";
+        cout << "\n4. Sort Items by Cost";
+        cout << "\n5. Delete Item";
+        cout << "\n6. Exit";
+        cout << "\nEnter your choice: ";
         cin >> choice;
-    } while (tolower(choice) == 'y');
+
+        switch (choice) {
+            case 1: insertItem(); break;
+            case 2: displayItems(); break;
+            case 3: searchItem(); break;
+            case 4: sortItems(); break;
+            case 5: deleteItem(); break;
+            case 6: cout << "Exiting program.\n"; break;
+            default: cout << "Invalid choice. Try again.\n";
+        }
+    } while (choice != 6);
 
     return 0;
+}
+
+// Insert a new item
+void insertItem() {
+    Item item;
+    cout << "\nEnter Item Name: ";
+    cin >> item.name;
+    cout << "Enter Item Quantity: ";
+    cin >> item.quantity;
+    cout << "Enter Item Cost: ";
+    cin >> item.cost;
+    cout << "Enter Item Code: ";
+    cin >> item.code;
+
+    items.push_back(item);
+    cout << "Item added successfully!\n";
+}
+
+// Display all items
+void displayItems() {
+    if (items.empty()) {
+        cout << "\nNo items to display.\n";
+        return;
+    }
+
+    for (const auto& item : items) {
+        cout << "\nItem Name: " << item.name;
+        cout << "\nItem Quantity: " << item.quantity;
+        cout << "\nItem Cost: " << item.cost;
+        cout << "\nItem Code: " << item.code << "\n";
+    }
+}
+
+// Search for an item by code
+void searchItem() {
+    int code;
+    cout << "\nEnter Item Code to search: ";
+    cin >> code;
+
+    auto it = find_if(items.begin(), items.end(), [&code](const Item& item) {
+        return item.code == code;
+    });
+
+    if (it != items.end()) {
+        cout << "Item found: \n";
+        cout << "Name: " << it->name << ", Quantity: " << it->quantity 
+             << ", Cost: " << it->cost << ", Code: " << it->code << "\n";
+    } else {
+        cout << "Item not found.\n";
+    }
+}
+
+// Delete an item by code
+void deleteItem() {
+    int code;
+    cout << "\nEnter Item Code to delete: ";
+    cin >> code;
+
+    auto it = find_if(items.begin(), items.end(), [&code](const Item& item) {
+        return item.code == code;
+    });
+
+    if (it != items.end()) {
+        items.erase(it);
+        cout << "Item deleted successfully.\n";
+    } else {
+        cout << "Item not found.\n";
+    }
+}
+
+// Sort items by cost
+void sortItems() {
+    sort(items.begin(), items.end(), [](const Item& a, const Item& b) {
+        return a.cost < b.cost;
+    });
+
+    cout << "Items sorted by cost.\n";
+    displayItems();
 }
